@@ -1,8 +1,6 @@
 from machine import Pin, PWM, I2C
 import utime
 
-pir_pin = Pin(18, Pin.IN)
-
 buzzer_pin = Pin(27, Pin.OUT)
 buzzer = PWM(buzzer_pin)
 
@@ -17,10 +15,13 @@ matrix_keys = [
 
 keypad_rows = [9, 8, 7, 6]
 keypad_columns = [5, 4, 3, 2]
-password = "0"
+password = "0519" 
 
 col_pins = [Pin(pin, Pin.IN, Pin.PULL_DOWN) for pin in keypad_columns]
 row_pins = [Pin(pin, Pin.OUT) for pin in keypad_rows]
+
+trigger = Pin(10, Pin.OUT)
+echo = Pin(11, Pin.IN)
 
 for row in row_pins:
     row.value(1)
@@ -29,52 +30,73 @@ motion_detected_flag = False
 password_correct_time = 0
 
 def scankeys():
-    for row in range(4):
-        row_pins[row].high()
-        for col in range(4):
-            if col_pins[col].value() == 1:
-                print("You have pressed: ", matrix_keys[row][col])
-                key_press = matrix_keys[row][col]
-                utime.sleep(0.3)  # Debounce delay
-                row_pins[row].low()
-                return key_press 
-        row_pins[row].low()
-    return None
+    entered_password = ""
+    while len(entered_password) < 4:  # loops until 4 keys are pressed
+        for row in range(4):
+            row_pins[row].high()
+            for col in range(4):
+                if col_pins[col].value() == 1:
+                    print("You have pressed: ", matrix_keys[row][col])
+                    entered_password += matrix_keys[row][col]
+                    utime.sleep(0.3)
+                    row_pins[row].low()
+                    if len(entered_password) == 4:
+                        return entered_password
+            row_pins[row].low()
+    return entered_password
 
-def motion_detected(pin):
-    global motion_detected_flag, password_correct_time
-    if not motion_detected_flag:
-        motion_detected_flag = True
-        print("Motion detected!")
-
-        buzzer.duty_u16(1000)  
-        buzzer.freq(500)
-        led.on()
-
-        print("Please enter a key from the keypad")
-        key = None
-        while key is None:
-            key = scankeys()
+def measure_distance():
+    trigger.low()
+    utime.sleep_us(5)
+    trigger.high()
+    utime.sleep_us(10)
+    trigger.low()
+    
+    while echo.value() == 0:
+        signaloff = utime.ticks_us()
+    while echo.value() == 1:
+        signalon = utime.ticks_us()
         
-        if key == password:
-            buzzer.duty_u16(0)
-            led.off()
-            print("Correct password entered, alarm deactivated.")
-            password_correct_time = utime.time()
-            utime.sleep(8)  # wait before allowing new motion detection
+    timepassed = utime.ticks_diff(signalon, signaloff)
+    distance = (timepassed * 0.0343) / 2
+    print("The distance from object is ", distance, "cm.")
+    return distance
 
-        motion_detected_flag = False
+def check_distance():
+    global motion_detected_flag, password_correct_time
+    
+    if not motion_detected_flag and utime.time() - password_correct_time >= 10:
+        distance = measure_distance()
+        if distance <= 50:  # cutoff is 50 cm
+            motion_detected_flag = True
+            print("Motion detected!")
 
-# Configure the PIR sensor to trigger an interrupt on motion
-pir_pin.irq(trigger=Pin.IRQ_RISING, handler=motion_detected)
+            buzzer.duty_u16(1000)  
+            buzzer.freq(500)
+            led.on()
 
-# Main loop
+            print("Please enter the 4-digit password from the keypad")
+            entered_password = scankeys()
+            
+            if entered_password == password:
+                buzzer.duty_u16(0)
+                led.off()
+                print("Correct password entered, alarm deactivated.")
+                password_correct_time = utime.time()
+                utime.sleep(2)  # wait before allowing new motion detection
+
+            motion_detected_flag = False
+
+# main loop
 try:
     while True:
-        current_time = utime.time()
-        if current_time - password_correct_time >= 10:
-            print("Waiting for motion...")
-            utime.sleep(1)
+        check_distance()
+        utime.sleep(1) 
+
+except KeyboardInterrupt:
+    buzzer.deinit()
+    led.off()
+    print("Exiting...")
 
 except KeyboardInterrupt:
     pir_pin.irq(handler=None) 
