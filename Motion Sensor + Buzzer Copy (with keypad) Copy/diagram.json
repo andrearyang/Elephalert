@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "author": "Andrea Yang",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "wokwi-pi-pico",
+      "id": "pico",
+      "top": -3.15,
+      "left": 3.6,
+      "attrs": { "env": "micropython-20230426-v1.20.0" }
+    },
+    { "type": "wokwi-pir-motion-sensor", "id": "pir1", "top": -53.6, "left": 88.62, "attrs": {} },
+    {
+      "type": "wokwi-buzzer",
+      "id": "bz1",
+      "top": 69.6,
+      "left": 97.8,
+      "attrs": { "volume": "0.1" }
+    },
+    { "type": "wokwi-led", "id": "led1", "top": 150, "left": -34.6, "attrs": { "color": "red" } },
+    {
+      "type": "wokwi-membrane-keypad",
+      "id": "keypad1",
+      "top": -137.8,
+      "left": -327.8,
+      "rotate": 270,
+      "attrs": {}
+    }
+  ],
+  "connections": [
+    [ "pir1:VCC", "pico:3V3_EN", "red", [ "v0" ] ],
+    [ "pir1:GND", "pico:GND.8", "black", [ "v0" ] ],
+    [ "pir1:OUT", "pico:GP18", "green", [ "v0" ] ],
+    [ "bz1:1", "pico:GND.7", "green", [ "v0" ] ],
+    [ "bz1:2", "pico:GP27", "green", [ "v0" ] ],
+    [ "led1:C", "pico:GND.2", "purple", [ "v0" ] ],
+    [ "led1:A", "pico:GP12", "green", [ "v0" ] ],
+    [ "keypad1:C4", "pico:GP2", "green", [ "h0" ] ],
+    [ "keypad1:C3", "pico:GP3", "green", [ "h0" ] ],
+    [ "keypad1:C2", "pico:GP4", "green", [ "h0" ] ],
+    [ "keypad1:C1", "pico:GP5", "green", [ "h0" ] ],
+    [ "keypad1:R4", "pico:GP6", "green", [ "h0" ] ],
+    [ "keypad1:R3", "pico:GP7", "green", [ "h0" ] ],
+    [ "keypad1:R2", "pico:GP8", "green", [ "h0" ] ],
+    [ "keypad1:R1", "pico:GP9", "green", [ "h0" ] ]
+  ],
+  "dependencies": {}
+}
