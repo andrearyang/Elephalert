@@ -10,32 +10,43 @@
       "left": 3.6,
       "attrs": { "env": "micropython-20230426-v1.20.0" }
     },
-    { "type": "wokwi-pir-motion-sensor", "id": "pir1", "top": -53.6, "left": 88.62, "attrs": {} },
     {
       "type": "wokwi-buzzer",
       "id": "bz1",
-      "top": 69.6,
-      "left": 97.8,
+      "top": -26.4,
+      "left": 270.6,
       "attrs": { "volume": "0.1" }
     },
-    { "type": "wokwi-led", "id": "led1", "top": 150, "left": -34.6, "attrs": { "color": "red" } },
+    {
+      "type": "wokwi-led",
+      "id": "led1",
+      "top": 130.8,
+      "left": -63.4,
+      "attrs": { "color": "red" }
+    },
     {
       "type": "wokwi-membrane-keypad",
       "id": "keypad1",
       "top": -137.8,
-      "left": -327.8,
+      "left": -366.2,
       "rotate": 270,
       "attrs": {}
-    }
+    },
+    {
+      "type": "wokwi-hc-sr04",
+      "id": "ultrasonic1",
+      "top": -200.1,
+      "left": 43.9,
+      "attrs": { "distance": "41" }
+    },
+    { "type": "wokwi-led", "id": "led2", "top": 82.8, "left": -53.8, "attrs": { "color": "red" } },
+    { "type": "wokwi-led", "id": "led3", "top": 150, "left": 109.4, "attrs": { "color": "red" } }
   ],
   "connections": [
-    [ "pir1:VCC", "pico:3V3_EN", "red", [ "v0" ] ],
-    [ "pir1:GND", "pico:GND.8", "black", [ "v0" ] ],
-    [ "pir1:OUT", "pico:GP18", "green", [ "v0" ] ],
     [ "bz1:1", "pico:GND.7", "green", [ "v0" ] ],
     [ "bz1:2", "pico:GP27", "green", [ "v0" ] ],
-    [ "led1:C", "pico:GND.2", "purple", [ "v0" ] ],
-    [ "led1:A", "pico:GP12", "green", [ "v0" ] ],
+    [ "led1:C", "pico:GND.2", "purple", [ "h29.2", "v-96" ] ],
+    [ "led1:A", "pico:GP12", "green", [ "v9.6", "h28.8", "v-28.8" ] ],
     [ "keypad1:C4", "pico:GP2", "green", [ "h0" ] ],
     [ "keypad1:C3", "pico:GP3", "green", [ "h0" ] ],
     [ "keypad1:C2", "pico:GP4", "green", [ "h0" ] ],
@@ -43,7 +54,15 @@
     [ "keypad1:R4", "pico:GP6", "green", [ "h0" ] ],
     [ "keypad1:R3", "pico:GP7", "green", [ "h0" ] ],
     [ "keypad1:R2", "pico:GP8", "green", [ "h0" ] ],
-    [ "keypad1:R1", "pico:GP9", "green", [ "h0" ] ]
+    [ "keypad1:R1", "pico:GP9", "green", [ "h0" ] ],
+    [ "pico:3V3", "ultrasonic1:VCC", "red", [ "h0" ] ],
+    [ "pico:GND.6", "ultrasonic1:GND", "black", [ "h0" ] ],
+    [ "pico:GP10", "ultrasonic1:TRIG", "yellow", [ "h0" ] ],
+    [ "pico:GP11", "ultrasonic1:ECHO", "orange", [ "h0" ] ],
+    [ "pico:GND.3", "led2:C", "black", [ "h-19.2", "v19.2", "h-28.8" ] ],
+    [ "led2:A", "pico:GP13", "green", [ "v9.6", "h28.8", "v28.8" ] ],
+    [ "led3:C", "pico:GND.5", "black", [ "v0" ] ],
+    [ "led3:A", "pico:GP18", "green", [ "v0" ] ]
   ],
   "dependencies": {}
 }
